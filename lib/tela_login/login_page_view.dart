@@ -66,7 +66,7 @@ class _LoginPageState extends State<LoginPage> {
                         Navigator.pushReplacementNamed(context, HomePage.routeName);
                         
                       } else {
-                        print("login inválido");
+                        debugPrint("login inválido");
                       }
                     },
                     child: const Text('Entrar'),

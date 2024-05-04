@@ -4,7 +4,6 @@ import 'package:dm_flutter/models/api_response_model.dart';
 import 'package:dm_flutter/services/preferences.dart';
 import 'package:dm_flutter/utils.dart';
 import 'package:flutter/foundation.dart';
-import 'package:file_picker/file_picker.dart';
 
 
 class RequestsService {
@@ -22,7 +21,6 @@ class RequestsService {
             HttpHeaders.authorizationHeader: basicAuth
           }));
       if (response.statusCode == 200) {
-        print(response.statusCode);
         return true;
       }
     } on DioException catch (e) {
@@ -36,11 +34,9 @@ class RequestsService {
     String uri;
     try {
       uri = 'https://artifacts.mot.com/artifactory/$product/';
-      print(uri);
 
       Preferences pref = Preferences();
       String basicAuth = await pref.getBasicAuth();
-      print(basicAuth);
 
       var response = await Dio().get(uri,
           options: Options(headers: {
@@ -48,7 +44,6 @@ class RequestsService {
             HttpHeaders.authorizationHeader: basicAuth
           }));
       if (response.statusCode == 200) {
-        print(response.statusCode);
         List<String> listaVersoesAndroid =
             ArtifactoryFunctions().getVersoesAndroid(response.data);
         return ApiResponseModel(
@@ -65,11 +60,9 @@ class RequestsService {
     String uri;
     try {
       uri = 'https://artifacts.mot.com/artifactory/$product/$version';
-      print(uri);
 
       Preferences pref = Preferences();
       String basicAuth = await pref.getBasicAuth();
-      print(basicAuth);
 
       var response = await Dio().get(uri,
           options: Options(headers: {
@@ -77,10 +70,8 @@ class RequestsService {
             HttpHeaders.authorizationHeader: basicAuth
           }));
       if (response.statusCode == 200) {
-        print(response.statusCode);
         List<String> listaDeBuilds =
             ArtifactoryFunctions().getBuilds(response.data);
-        print(listaDeBuilds);
         return ApiResponseModel(successfulConnection: true, data: listaDeBuilds);
       }
     } on DioException catch (e) {
@@ -95,11 +86,9 @@ class RequestsService {
     String uri;
     try {
       uri = 'https://artifacts.mot.com/artifactory/$product/$version/$build';
-      print(uri);
 
       Preferences pref = Preferences();
       String basicAuth = await pref.getBasicAuth();
-      print(basicAuth);
 
       var response = await Dio().get(uri,
           options: Options(headers: {
@@ -107,10 +96,8 @@ class RequestsService {
             HttpHeaders.authorizationHeader: basicAuth
           }));
       if (response.statusCode == 200) {
-        print(response.statusCode);
         List<String> listaDeBuildNames =
             ArtifactoryFunctions().getBuildName(response.data);
-        print(listaDeBuildNames);
         return ApiResponseModel(successfulConnection: true, data: listaDeBuildNames);
       }
     } on DioException catch (e) {
@@ -125,11 +112,9 @@ class RequestsService {
     String uri;
     try {
       uri = 'https://artifacts.mot.com/artifactory/$product/$version/$buildVersion/$buildName';
-      print(uri);
 
       Preferences pref = Preferences();
       String basicAuth = await pref.getBasicAuth();
-      print(basicAuth);
 
       var response = await Dio().get(uri,
           options: Options(headers: {
@@ -137,10 +122,8 @@ class RequestsService {
             HttpHeaders.authorizationHeader: basicAuth
           }));
       if (response.statusCode == 200) {
-        print(response.statusCode);
         List<String> listaDeTypeUser =
             ArtifactoryFunctions().getTypeUser(response.data);
-        print(listaDeTypeUser);
         return ApiResponseModel(successfulConnection: true, data: listaDeTypeUser);
       }
     } on DioException catch (e) {
@@ -155,11 +138,9 @@ class RequestsService {
     String uri;
     try {
       uri = 'https://artifacts.mot.com/artifactory/$product/$version/$buildVersion/$buildName/$user';
-      print(uri);
 
       Preferences pref = Preferences();
       String basicAuth = await pref.getBasicAuth();
-      print(basicAuth);
 
       var response = await Dio().get(uri,
           options: Options(headers: {
@@ -167,10 +148,8 @@ class RequestsService {
             HttpHeaders.authorizationHeader: basicAuth
           }));
       if (response.statusCode == 200) {
-        print(response.statusCode);
         List<String> listaDeReleaseCid =
             ArtifactoryFunctions().getReleaseCid(response.data);
-        print(listaDeReleaseCid);
         return ApiResponseModel(successfulConnection: true, data: listaDeReleaseCid);
       }
     } on DioException catch (e) {
@@ -184,11 +163,9 @@ class RequestsService {
     String uri;
     try {
       uri = 'https://artifacts.mot.com/artifactory/$product/$version/$buildVersion/$buildName/$user/$releaseCid';
-      print(uri);
 
       Preferences pref = Preferences();
       String basicAuth = await pref.getBasicAuth();
-      print(basicAuth);
 
       var response = await Dio().get(uri,
           options: Options(headers: {
@@ -209,18 +186,17 @@ class RequestsService {
 
   Future<ApiResponseModel> downloadFile(product, version, buildVersion, buildName, user, releaseCid, fileName) async {
     String uri;
-    String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
+    Preferences pref = Preferences();
+    String selectedDirectory = await pref.getDownloadDefaultFolder();
 
     // Construa o caminho do arquivo local.
     String filePath = '$selectedDirectory/$fileName';
 
-    Preferences pref = Preferences();
     String basicAuth = await pref.getBasicAuth();
 
     // Inicie o download
     try{
       uri = 'https://artifacts.mot.com/artifactory/$product/$version/$buildVersion/$buildName/$user/$releaseCid/$fileName';
-      print(uri);
 
       var response = await Dio().download(
         uri, 
@@ -232,11 +208,11 @@ class RequestsService {
         onReceiveProgress: (received, total) {
           if (total != -1) {
             // Você pode usar este callback para mostrar a porcentagem de download.
-            print((received / total * 100).toStringAsFixed(0) + "%");
+            // print((received / total * 100).toStringAsFixed(0) + "%");
           }
         },
       );
-      print("Download completed: $filePath");
+      debugPrint("Download completed: $filePath");
 
     } on DioException catch (e) {
       debugPrint(e.message.toString());

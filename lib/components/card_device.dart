@@ -2,13 +2,18 @@ import 'package:dm_flutter/homepage_controller.dart';
 import 'package:dm_flutter/models/device_model.dart';
 import 'package:flutter/material.dart';
 
-class CardDevice extends StatelessWidget {
+class CardDevice extends StatefulWidget {
   final DeviceModel device;
   final HomepageController homeController;
   const CardDevice(
       {Key? key, required this.device, required this.homeController})
       : super(key: key);
 
+  @override
+  State<CardDevice> createState() => _CardDeviceState();
+}
+
+class _CardDeviceState extends State<CardDevice> {
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -34,13 +39,17 @@ class CardDevice extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(device.product ?? ''),
-                  Text(device.barcode ?? ''),
-                  Text(device.roCarrier ?? ''),
-                  Text(device.isWarrantyVoid ?? ''),
-                  Text(device.build ?? ''),
+                  Text(widget.device.product ?? ''),
+                  Text(widget.device.barcode ?? ''),
+                  Text(widget.device.roCarrier ?? ''),
+                  Text(widget.device.isWarrantyVoid ?? ''),
+                  Text(widget.device.build ?? ''),
                 ],
-              )
+              ),
+
+              !widget.device.deviceSelecionado
+                ? const Icon(Icons.check_box_outline_blank)
+                : const Icon(Icons.check_box)
             ],
           )),
     );

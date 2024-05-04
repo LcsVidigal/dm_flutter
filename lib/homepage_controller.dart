@@ -8,8 +8,9 @@ class HomepageController = HomepageControllerBase with _$HomepageController;
 
 abstract class HomepageControllerBase with Store {
   List<DeviceModel> listOfDevices = List<DeviceModel>.empty(growable: true);
+  List<DeviceModel> listOfSelectedDevices = List<DeviceModel>.empty(growable: true);
 
-  DeviceModel deviceSelected = DeviceModel();
+
 
   @observable
   String teste = 'lucas';
@@ -17,8 +18,17 @@ abstract class HomepageControllerBase with Store {
   Future getDevices() async {
     listOfDevices.clear();
     listOfDevices = await DeviceFunctions().getAllDevicesInFastboot();
-    print(listOfDevices.length);
   }
+
+
+  popularListaDeDevicesSelecionados() {
+    listOfSelectedDevices = listOfDevices.where((device) => device.deviceSelecionado).toList();
+    
+  }
+
+
+
+
 
   
 }

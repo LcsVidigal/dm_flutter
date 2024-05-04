@@ -23,6 +23,7 @@ class DeviceModel {
   String? roCarrier;
   String? slotCount;
   String? buildVersion;
+  bool deviceSelecionado;
 
   DeviceModel({
     this.product,
@@ -48,6 +49,7 @@ class DeviceModel {
     this.frpState,
     this.roCarrier,
     this.slotCount,
+    this.deviceSelecionado = false
   });
 
   String? get build => DeviceModel().getBuildVersion(buildFingerprint ?? '');

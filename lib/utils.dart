@@ -2,16 +2,16 @@ import 'dart:io';
 
 import 'package:dm_flutter/models/device_model.dart';
 
-Future<String> callCommand(String command) async {
-  ProcessResult resultado =
-      await Process.run('$command 2>&1', [], runInShell: true);
+Future<String> callCommand(String command, String? directory) async {
+  ProcessResult resultado = await Process.run('$command 2>&1', [],
+      runInShell: true, workingDirectory: directory);
 
   return resultado.stdout;
 }
 
 class DeviceFunctions {
   Future<List<DeviceModel>> getAllDevicesInFastboot() async {
-    String response = await callCommand('fastboot devices');
+    String response = await callCommand('fastboot devices', null);
     List<String> listAux = response.split("\n");
     listAux.removeLast();
 
@@ -32,7 +32,8 @@ class DeviceFunctions {
 
   // Executa um getvar all no barcode enviado e retorna um objeto DeviceModel
   Future<DeviceModel> getDeviceInfo(barcode) async {
-    String response = await callCommand('fastboot getvar all -s $barcode');
+    String response =
+        await callCommand('fastboot getvar all -s $barcode', null);
     String aux = response.replaceAll('(bootloader) ', '');
     List<String> listAux = aux.split("\n");
     listAux.removeWhere((element) => !element.contains(':'));
@@ -85,7 +86,6 @@ class ArtifactoryFunctions {
     return links;
   }
 
-
   List<String> getBuildName(String texto) {
     // Criando uma expressão regular para encontrar os nomes dos diretórios
     RegExp regExp = RegExp(r'<a href="([^"]+)">([^<]+)</a>');
@@ -100,7 +100,6 @@ class ArtifactoryFunctions {
 
     directoryNames.removeAt(0);
 
-
     return directoryNames;
   }
 
@@ -114,7 +113,8 @@ class ArtifactoryFunctions {
     List<String> directoryNames = [];
     for (final match in matches) {
       String dirName = match.group(1) ?? "";
-      if (dirName != "..") {  // Ignora o diretório pai "../"
+      if (dirName != "..") {
+        // Ignora o diretório pai "../"
         directoryNames.add(dirName);
       }
     }
@@ -132,7 +132,8 @@ class ArtifactoryFunctions {
     List<String> directoryNames = [];
     for (final match in matches) {
       String dirName = match.group(1) ?? "";
-      if (dirName != "..") {  // Ignora o diretório pai "../"
+      if (dirName != "..") {
+        // Ignora o diretório pai "../"
         directoryNames.add(dirName);
       }
     }
@@ -148,9 +149,9 @@ class ArtifactoryFunctions {
 
     // Verificar se encontrou uma correspondência e retornar o nome completo do arquivo
     if (match != null) {
-      return 'fastboot${match.group(1)!}';  // Constrói o nome completo do arquivo
+      return 'fastboot${match.group(1)!}'; // Constrói o nome completo do arquivo
     }
 
-    return null;  // Retorna null se nenhum arquivo "fastboot" for encontrado
+    return null; // Retorna null se nenhum arquivo "fastboot" for encontrado
   }
 }

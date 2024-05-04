@@ -26,16 +26,6 @@ class _TelaMultiState extends State<TelaMulti> {
 
   @override
   Widget build(BuildContext context) {
-    // getTeste() async {
-    //   // if (telaMultiController.listAndroidVersion.isNotEmpty &&
-    //   //     productController.text != '') {
-    //   print('testeeeee');
-    //   await telaMultiController.getListAndroidVersions(productController.text);
-    //   setState(() {});
-    //   // }
-    // }
-    // getTeste();
-
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(children: [
@@ -44,17 +34,10 @@ class _TelaMultiState extends State<TelaMulti> {
           height: 40,
           child: TextField(
             onSubmitted: ((value) async {
-              print(value);
               await telaMultiController.getListAndroidVersions(value);
               _keyDropVersao.currentState!.reset();
               setState(() {});
             }),
-            // onChanged: ((value) async {
-            //   print(value);
-            //   await telaMultiController.getListAndroidVersions(value);
-            //   _keyDropVersao.currentState!.reset();
-            //   setState(() {});
-            // }),
             controller: widget.productController,
             decoration: const InputDecoration(
               label: Text('Produto'),
@@ -197,18 +180,42 @@ class _TelaMultiState extends State<TelaMulti> {
           height: 20,
         ),
         TextButton(
-            onPressed: !telaMultiController.fastbootExists ? null :
-              () {
-                telaMultiController.downloadFile(
-                  widget.productController.text,
-                  _keyDropVersao.currentState!.value,
-                  _keyDropBuild.currentState!.value,
-                  _keyDropBuildName.currentState!.value,
-                  _keyDropTypeUser.currentState!.value,
-                  _keyDropReleaseCid.currentState!.value,
-                );
-              },
-            child: const Text('Baixar build'))
+            onPressed: !telaMultiController.fastbootExists
+                ? null
+                : () {
+                    telaMultiController.downloadFile(
+                      widget.productController.text,
+                      _keyDropVersao.currentState!.value,
+                      _keyDropBuild.currentState!.value,
+                      _keyDropBuildName.currentState!.value,
+                      _keyDropTypeUser.currentState!.value,
+                      _keyDropReleaseCid.currentState!.value,
+                    );
+                  },
+            child: const Text('Baixar build')),
+        const SizedBox(
+          height: 20,
+        ),
+        TextButton(
+            onPressed: () {
+              telaMultiController.extractBuild();
+            },
+            child: const Text('extrair build')),
+        TextButton(
+            onPressed: () {
+              telaMultiController.flashDevices(widget.homeController.listOfSelectedDevices);
+            },
+            child: const Text('Flash devices selecionados')),
+        TextButton(
+            onPressed: () {
+              telaMultiController.baixarExtrairFlashar(widget.productController.text,
+                      _keyDropVersao.currentState!.value,
+                      _keyDropBuild.currentState!.value,
+                      _keyDropBuildName.currentState!.value,
+                      _keyDropTypeUser.currentState!.value,
+                      _keyDropReleaseCid.currentState!.value, widget.homeController.listOfSelectedDevices);
+            },
+            child: const Text('baixar flashar e extrair (todos os campos precisam estar preenchidos e válidos)')),
       ]),
     );
   }
