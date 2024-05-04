@@ -4,8 +4,8 @@ import 'package:dm_flutter/models/api_response_model.dart';
 import 'package:dm_flutter/services/preferences.dart';
 import 'package:dm_flutter/utils.dart';
 import 'package:flutter/foundation.dart';
-import 'package:path_provider/path_provider.dart';
-// import 'package:http/http.dart' as http;
+import 'package:file_picker/file_picker.dart';
+
 
 class RequestsService {
   Future connectArtifactory(token) async {
@@ -180,10 +180,10 @@ class RequestsService {
     return ApiResponseModel(successfulConnection: false);
   }
 
-  Future<ApiResponseModel> getFastbootFile(product, version, buildVersion, buildName, user) async {
+  Future<ApiResponseModel> getFastbootFile(product, version, buildVersion, buildName, user, releaseCid) async {
     String uri;
     try {
-      uri = 'https://artifacts.mot.com/artifactory/$product/$version/$buildVersion/$buildName/$user';
+      uri = 'https://artifacts.mot.com/artifactory/$product/$version/$buildVersion/$buildName/$user/$releaseCid';
       print(uri);
 
       Preferences pref = Preferences();
@@ -196,11 +196,9 @@ class RequestsService {
             HttpHeaders.authorizationHeader: basicAuth
           }));
       if (response.statusCode == 200) {
-        print(response.statusCode);
-        List<String> listaDeReleaseCid =
-            ArtifactoryFunctions().getReleaseCid(response.data);
-        print(listaDeReleaseCid);
-        return ApiResponseModel(successfulConnection: true, data: listaDeReleaseCid);
+        String? fastbootFile =
+            ArtifactoryFunctions().getFastbootFile(response.data);
+        return ApiResponseModel(successfulConnection: true, data: fastbootFile);
       }
     } on DioException catch (e) {
       debugPrint(e.message.toString());
@@ -209,22 +207,43 @@ class RequestsService {
     return ApiResponseModel(successfulConnection: false);
   }
 
-  // Future<void> downloadFile(String url, String filename) async {
-  //   // Obtendo o diretório onde salvar o arquivo
-  //   Directory dir = await getApplicationDocumentsDirectory();
-  //   String filePath = '${dir.path}/$filename';
+  Future<ApiResponseModel> downloadFile(product, version, buildVersion, buildName, user, releaseCid, fileName) async {
+    String uri;
+    String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
 
-  //   // Fazendo a requisição HTTP para obter o arquivo
-  //   http.Response response = await http.get(Uri.parse(url));
+    // Construa o caminho do arquivo local.
+    String filePath = '$selectedDirectory/$fileName';
 
-  //   // Verificando se a requisição foi bem sucedida
-  //   if (response.statusCode == 200) {
-  //     // Criando o arquivo no diretório especificado e escrevendo os dados
-  //     File file = File(filePath);
-  //     await file.writeAsBytes(response.bodyBytes);
-  //     print('Arquivo salvo em $filePath');
-  //   } else {
-  //     throw Exception('Falha ao baixar o arquivo: ${response.statusCode}');
-  //   }
-  // }
+    Preferences pref = Preferences();
+    String basicAuth = await pref.getBasicAuth();
+
+    // Inicie o download
+    try{
+      uri = 'https://artifacts.mot.com/artifactory/$product/$version/$buildVersion/$buildName/$user/$releaseCid/$fileName';
+      print(uri);
+
+      var response = await Dio().download(
+        uri, 
+        filePath,
+        options: Options(headers: {
+          HttpHeaders.contentTypeHeader: "application/json",
+          HttpHeaders.authorizationHeader: basicAuth
+        }),
+        onReceiveProgress: (received, total) {
+          if (total != -1) {
+            // Você pode usar este callback para mostrar a porcentagem de download.
+            print((received / total * 100).toStringAsFixed(0) + "%");
+          }
+        },
+      );
+      print("Download completed: $filePath");
+
+    } on DioException catch (e) {
+      debugPrint(e.message.toString());
+      return ApiResponseModel(successfulConnection: false);
+    }
+    return ApiResponseModel(successfulConnection: false);
+      
+
+  }
 }

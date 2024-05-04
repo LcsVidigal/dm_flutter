@@ -1,7 +1,9 @@
 import 'package:dm_flutter/components/card_device.dart';
 import 'package:dm_flutter/homepage_controller.dart';
+import 'package:dm_flutter/services/preferences.dart';
 import 'package:dm_flutter/tela_multi/tela_multi_view.dart';
 import 'package:dm_flutter/utils.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -57,7 +59,29 @@ class _HomePageState extends State<HomePage> {
                       style: TextStyle(
                           fontWeight: FontWeight.w500,
                           fontSize: 14,
-                          color: Colors.white)))
+                          color: Colors.white))),
+              
+              const SizedBox(height: 20),
+              TextButton(
+                  onPressed: () async {
+                    String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
+                    if(selectedDirectory != null){
+                      Preferences().setDownloadDefaultFolder(selectedDirectory);
+                    }
+                  },
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('Default folder',
+                          softWrap: true,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 14,
+                              color: Colors.white)),
+                      Icon(Icons.folder)
+                    ],
+                  ))
             ]),
           ),
           Expanded(

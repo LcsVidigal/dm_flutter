@@ -17,16 +17,15 @@ class _TelaMultiState extends State<TelaMulti> {
 
   final GlobalKey<FormFieldState> _keyDropVersao = GlobalKey<FormFieldState>();
   final GlobalKey<FormFieldState> _keyDropBuild = GlobalKey<FormFieldState>();
-  final GlobalKey<FormFieldState> _keyDropBuildName = GlobalKey<FormFieldState>();
-  final GlobalKey<FormFieldState> _keyDropTypeUser = GlobalKey<FormFieldState>();
-  final GlobalKey<FormFieldState> _keyDropReleaseCid = GlobalKey<FormFieldState>();
-
-
-
+  final GlobalKey<FormFieldState> _keyDropBuildName =
+      GlobalKey<FormFieldState>();
+  final GlobalKey<FormFieldState> _keyDropTypeUser =
+      GlobalKey<FormFieldState>();
+  final GlobalKey<FormFieldState> _keyDropReleaseCid =
+      GlobalKey<FormFieldState>();
 
   @override
   Widget build(BuildContext context) {
-
     // getTeste() async {
     //   // if (telaMultiController.listAndroidVersion.isNotEmpty &&
     //   //     productController.text != '') {
@@ -105,13 +104,14 @@ class _TelaMultiState extends State<TelaMulti> {
                 .toList(),
             onChanged: (buildVersion) async {
               _keyDropBuildName.currentState!.reset();
-              await telaMultiController.getListOfBuildName(widget.productController.text, _keyDropVersao.currentState!.value, buildVersion!);
-              setState(() {
-              });
+              await telaMultiController.getListOfBuildName(
+                  widget.productController.text,
+                  _keyDropVersao.currentState!.value,
+                  buildVersion!);
+              setState(() {});
             },
           ),
         ),
-
         const SizedBox(
           height: 20,
         ),
@@ -129,13 +129,15 @@ class _TelaMultiState extends State<TelaMulti> {
                 .toList(),
             onChanged: (buildName) async {
               _keyDropTypeUser.currentState!.reset();
-              await telaMultiController.getListOfTypeUser(widget.productController.text, _keyDropVersao.currentState!.value, _keyDropBuild.currentState!.value, buildName!);
-              setState(() {
-              });
+              await telaMultiController.getListOfTypeUser(
+                  widget.productController.text,
+                  _keyDropVersao.currentState!.value,
+                  _keyDropBuild.currentState!.value,
+                  buildName!);
+              setState(() {});
             },
           ),
         ),
-
         const SizedBox(
           height: 20,
         ),
@@ -153,14 +155,16 @@ class _TelaMultiState extends State<TelaMulti> {
                 .toList(),
             onChanged: (typeUser) async {
               _keyDropReleaseCid.currentState!.reset();
-              await telaMultiController.getListOfReleaseCid(widget.productController.text, _keyDropVersao.currentState!.value, _keyDropBuild.currentState!.value, _keyDropBuildName.currentState!.value, typeUser!);
-              setState(() {
-              });
+              await telaMultiController.getListOfReleaseCid(
+                  widget.productController.text,
+                  _keyDropVersao.currentState!.value,
+                  _keyDropBuild.currentState!.value,
+                  _keyDropBuildName.currentState!.value,
+                  typeUser!);
+              setState(() {});
             },
           ),
         ),
-        
-
         const SizedBox(
           height: 20,
         ),
@@ -170,21 +174,41 @@ class _TelaMultiState extends State<TelaMulti> {
           child: DropdownButtonFormField<String>(
             key: _keyDropReleaseCid,
             autovalidateMode: AutovalidateMode.onUserInteraction,
-            decoration: const InputDecoration.collapsed(hintText: 'Release Cid'),
+            decoration:
+                const InputDecoration.collapsed(hintText: 'Release Cid'),
             hint: const Text('Release Cid'),
             isExpanded: true,
             items: telaMultiController.listReleaseCid
                 .map((e) => DropdownMenuItem<String>(value: e, child: Text(e)))
                 .toList(),
-            onChanged: (versao) async {
-              // _keyDropBuild.currentState!.reset();
-              // await telaMultiController.getListOfBuilds(productController.text, versao!);
-              // setState(() {
-              // });
+            onChanged: (releaseCid) async {
+              await telaMultiController.getFastbootFileName(
+                  widget.productController.text,
+                  _keyDropVersao.currentState!.value,
+                  _keyDropBuild.currentState!.value,
+                  _keyDropBuildName.currentState!.value,
+                  _keyDropTypeUser.currentState!.value,
+                  releaseCid!);
+              setState(() {});
             },
           ),
         ),
-        
+        const SizedBox(
+          height: 20,
+        ),
+        TextButton(
+            onPressed: !telaMultiController.fastbootExists ? null :
+              () {
+                telaMultiController.downloadFile(
+                  widget.productController.text,
+                  _keyDropVersao.currentState!.value,
+                  _keyDropBuild.currentState!.value,
+                  _keyDropBuildName.currentState!.value,
+                  _keyDropTypeUser.currentState!.value,
+                  _keyDropReleaseCid.currentState!.value,
+                );
+              },
+            child: const Text('Baixar build'))
       ]),
     );
   }

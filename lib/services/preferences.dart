@@ -12,6 +12,16 @@ class Preferences {
     prefs.setBool('login', true);
   }
 
+  clearLogin(String coreId, String password, String token) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    
+    prefs.setString('token', '');
+    prefs.setString('coreId', '');
+    prefs.setString('passoword', '');
+    prefs.setString('basicAuth', "");
+    prefs.setBool('login', false);
+  }
+
   Future<String> getToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token;
@@ -43,4 +53,18 @@ class Preferences {
 
     return userModel;
   }
+
+  setDownloadDefaultFolder(String defaultFolder) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('downloadDefaultFolder', defaultFolder);
+  }
+
+  Future<String> getDownloadDefaultFolder() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? defaultFolder;
+
+    defaultFolder = prefs.getString('downloadDefaultFolder') ?? '';
+    return defaultFolder;
+  }
+
 }

@@ -7,8 +7,8 @@ class TelaMultiController {
   List<String> listBuildName = [];
   List<String> listTypeUser = [];
   List<String> listReleaseCid = [];
-
-
+  String fastbootFileName = '';
+  bool fastbootExists = false;
 
   RequestsService requestsService = RequestsService();
 
@@ -40,9 +40,10 @@ class TelaMultiController {
     print(listBuildName);
   }
 
-  Future getListOfTypeUser(String produto, String versao, String buildVersion, String buildName) async {
-    ApiResponseModel response =
-        await requestsService.getTypeUser(produto, versao, buildVersion, buildName);
+  Future getListOfTypeUser(String produto, String versao, String buildVersion,
+      String buildName) async {
+    ApiResponseModel response = await requestsService.getTypeUser(
+        produto, versao, buildVersion, buildName);
     if (response.successfulConnection == true) {
       listTypeUser = response.data;
     }
@@ -50,13 +51,35 @@ class TelaMultiController {
     print(listTypeUser);
   }
 
-  Future getListOfReleaseCid(String produto, String versao, String buildVersion, String buildName, String userType) async {
-    ApiResponseModel response =
-        await requestsService.getReleaseCid(produto, versao, buildVersion, buildName, userType);
+  Future getListOfReleaseCid(String produto, String versao, String buildVersion,
+      String buildName, String userType) async {
+    ApiResponseModel response = await requestsService.getReleaseCid(
+        produto, versao, buildVersion, buildName, userType);
     if (response.successfulConnection == true) {
       listReleaseCid = response.data;
     }
     print('pesquisa release cid');
     print(listReleaseCid);
+  }
+
+  Future getFastbootFileName(String produto, String versao, String buildVersion,
+      String buildName, String userType, String releaseCid) async {
+    ApiResponseModel response = await requestsService.getFastbootFile(
+        produto, versao, buildVersion, buildName, userType, releaseCid);
+    if (response.successfulConnection == true) {
+      fastbootFileName = response.data;
+      fastbootExists = true;
+    }
+    print('pesquisa release cid');
+    print(listReleaseCid);
+  }
+
+  Future<void> downloadFile(String produto, String versao, String buildVersion,
+      String buildName, String userType, String releaseCid) async {
+    ApiResponseModel response =
+        await requestsService.downloadFile(produto, versao, buildVersion, buildName, userType, releaseCid, fastbootFileName);
+    if (response.successfulConnection == true) {
+      listTypeUser = response.data;
+    }
   }
 }

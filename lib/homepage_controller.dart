@@ -19,4 +19,6 @@ abstract class HomepageControllerBase with Store {
     listOfDevices = await DeviceFunctions().getAllDevicesInFastboot();
     print(listOfDevices.length);
   }
+
+  
 }
