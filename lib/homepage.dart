@@ -2,6 +2,7 @@ import 'package:dm_flutter/components/card_device.dart';
 import 'package:dm_flutter/homepage_controller.dart';
 import 'package:dm_flutter/services/preferences.dart';
 import 'package:dm_flutter/tela_multi/tela_multi_view.dart';
+import 'package:dm_flutter/tela_scripts/tela_script_view.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
@@ -25,71 +26,97 @@ class _HomePageState extends State<HomePage> {
 
   loadDevices() async {
     await _homepageController.getDevices();
+    _homepageController.clearListDevicesSelecionados();
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
+    List<Widget> _widgetOptions = <Widget>[
+      TelaMulti(homeController: _homepageController),
+      TelaScripts(
+        homeController: _homepageController,
+      )
+    ];
     return Scaffold(
       body: Row(
         children: [
-          Container(
-            width: 180,
-            height: double.infinity,
-            color: Colors.red,
-            child: Column(children: [
-              TextButton(
-                  onPressed: () {},
-                  child: const Text('MultiFlash',
-                      softWrap: true,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 14,
-                          color: Colors.white))),
-              const SizedBox(height: 20),
-              TextButton(
-                  onPressed: () {
-                    _homepageController.getDevices();
-                  },
-                  child: const Text('Scripts',
-                      softWrap: true,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 14,
-                          color: Colors.white))),
-              const SizedBox(height: 20),
-              TextButton(
-                  onPressed: () async {
-                    String? selectedDirectory =
-                        await FilePicker.platform.getDirectoryPath();
-                    if (selectedDirectory != null) {
-                      Preferences().setDownloadDefaultFolder(selectedDirectory);
-                    }
-                  },
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text('Default folder',
-                          softWrap: true,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 14,
-                              color: Colors.white)),
-                      Icon(Icons.folder)
-                    ],
-                  ))
-            ]),
-          ),
+          menu(),
           Expanded(
-              child: TelaMulti(
-            homeController: _homepageController,
-          )),
+              child: _widgetOptions.elementAt(_homepageController.indexTelas)),
           devicesDisponiveis(),
         ],
       ),
+    );
+  }
+
+  Widget menu() {
+    return Container(
+      width: 180,
+      height: double.infinity,
+      color: Colors.red,
+      child: Column(children: [
+        const Text('Menu'),
+        TextButton(
+            onPressed: () async {
+              await _homepageController.getDevices();
+              _homepageController.clearListDevicesSelecionados();
+
+              setState(() {
+                _homepageController.indexTelas = 0;
+              });
+            },
+            child: const Text('MultiFlash',
+                softWrap: true,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 14,
+                    color: Colors.white))),
+
+
+        const SizedBox(height: 20),
+        TextButton(
+            onPressed: () async {
+              await _homepageController.getDevices();
+              _homepageController.clearListDevicesSelecionados();
+
+              setState(() {
+                _homepageController.indexTelas = 1;
+              });
+            },
+            child: const Text('Scripts',
+                softWrap: true,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 14,
+                    color: Colors.white))),
+
+        const Spacer(),           
+        TextButton(
+            onPressed: () async {
+              String? selectedDirectory =
+                  await FilePicker.platform.getDirectoryPath();
+              if (selectedDirectory != null) {
+                Preferences().setDownloadDefaultFolder(selectedDirectory);
+              }
+            },
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('Default folder',
+                    softWrap: true,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                        color: Colors.white)),
+                Icon(Icons.folder)
+              ],
+            )),
+        const SizedBox(height: 20),
+      ]),
     );
   }
 
@@ -108,8 +135,8 @@ class _HomePageState extends State<HomePage> {
             onTap: () => loadDevices(),
             child: const Icon(Icons.refresh),
           ),
-          Text('Devices selecionados: ${_homepageController.listOfSelectedDevices.length}'),
-
+          Text(
+              'Devices selecionados: ${_homepageController.listOfSelectedDevices.length}'),
           Expanded(
             child: ListView.builder(
                 padding:
@@ -142,7 +169,6 @@ class _HomePageState extends State<HomePage> {
                   );
                 }),
           ),
-
         ],
       ),
     );

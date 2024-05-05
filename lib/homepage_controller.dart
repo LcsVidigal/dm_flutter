@@ -8,9 +8,10 @@ class HomepageController = HomepageControllerBase with _$HomepageController;
 
 abstract class HomepageControllerBase with Store {
   List<DeviceModel> listOfDevices = List<DeviceModel>.empty(growable: true);
-  List<DeviceModel> listOfSelectedDevices = List<DeviceModel>.empty(growable: true);
+  List<DeviceModel> listOfSelectedDevices =
+      List<DeviceModel>.empty(growable: true);
 
-
+  int indexTelas = 0;
 
   @observable
   String teste = 'lucas';
@@ -20,15 +21,12 @@ abstract class HomepageControllerBase with Store {
     listOfDevices = await DeviceFunctions().getAllDevicesInFastboot();
   }
 
-
   popularListaDeDevicesSelecionados() {
-    listOfSelectedDevices = listOfDevices.where((device) => device.deviceSelecionado).toList();
-    
+    listOfSelectedDevices =
+        listOfDevices.where((device) => device.deviceSelecionado).toList();
   }
 
-
-
-
-
-  
+  clearListDevicesSelecionados() {
+    listOfSelectedDevices.clear();
+  }
 }
